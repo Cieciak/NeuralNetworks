@@ -1,2 +1,8 @@
 # Ignore all of network save states
 *.lbt
+
+# Ignore all compiled files
+*.out
+
+
+.vscode/
