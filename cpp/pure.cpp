@@ -17,6 +17,10 @@ float ReLU_prime(float x){
     else {return 0.0;}
 }
 
+float randf(){
+    return (float) rand() / RAND_MAX;
+}
+
 class ShapeException: std::exception {
     private:
         std::string msg;
@@ -76,6 +80,18 @@ class Matrix {
             for (int i = 0; i < rows; i++){
                 for (int j = 0; j < cols; j++){
                     data[i * cols + j] = 0.0;
+                }
+            }
+        }
+
+        void random(){
+            for (int row = 0; row < this->rows; row++){
+                for (int column = 0; column < this->cols; column++){
+                    this->setElement(
+                        row,
+                        column,
+                        randf()
+                    );
                 }
             }
         }
@@ -295,6 +311,9 @@ class Network{
             for (int index = 0; index < layers - 1; index++){
                 weights[index] = Matrix(shape[index + 1], shape[index]);
                 biases[index] = Matrix(shape[index + 1], 1);
+
+                weights[index].random();
+                biases[index].random();
             }
         }
 
@@ -337,6 +356,8 @@ class Network{
                 Matrix dB = dZ.sum(1).scale(1.0/float(m));
 
                 dZ = weights[index - 1].T().matmul(dZ).hadamard(R.unactivated[index - 1].map(&ReLU_prime));
+
+
 
                 weights[index - 1] = weights[index - 1].sub(dW.scale(alpha));
                 biases[index - 1] = biases[index - 1].sub(dB.scale(alpha));
@@ -431,16 +452,10 @@ int main(){
         for (int block = 0; block < power(2, 8 - 3); block++){
             NN.back(data.d[block], data.r[block]);
         }
+        NN.weights[0].print();
     }
 
     Matrix r = NN.forward(data.d[0]);
-
-    data.d[0].print();
-    std::cout << std::endl;
-
-    data.r[0].print();
-    std::cout << std::endl;
-
+    NN.weights[0].print();
     r.print();
-    std::cout << std::endl;
-}
+}   
