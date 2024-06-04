@@ -281,7 +281,7 @@ def convert(n: int, *, c: int = 8):
 def generate(size: int, bsize: int = 10):
     data = []
     for index in range(2 ** size):
-        if index % 7 == 0:
+        if index % 9 == 0:
             data.append(
                 [convert(index, c=size), [1.0, 0.0]]
             )

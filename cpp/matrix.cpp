@@ -39,7 +39,6 @@ class Matrix {
             for (int row = 0; row < this->rows; row++){
                 std::printf("|");
                 for (int column = 0; column < this->cols; column++){
-                    //std::printf(" (%i, %i) ", row, column);
                     std::printf(" %8.5f ", this->getElement(row, column));
                 }
                 std::printf("|\n");
@@ -86,7 +85,6 @@ class Matrix {
         // Add two matrixes and return the result
         Matrix add(Matrix other){
             Matrix M = Matrix(this->rows, this->cols, 0.0);
-            //printf("Entering add\n");
             if (other.cols == 1){
                 for (int i = 0; i < M.rows; i++){
                     for (int j = 0; j < M.cols; j++){
@@ -108,7 +106,6 @@ class Matrix {
                     }
                 }
             }
-            //printf("Exiting add\n\n");
             return M;
         }
 
@@ -220,8 +217,6 @@ class Matrix {
         }
 
         Matrix matmul(Matrix other){
-            //printf("Entering matmul\n");
-            //printf("(%i x %i) @ (%i x %i)\n", this->rows, this->cols, other.rows, other.cols);
 
             int k = this->rows;
             int l = this->cols;
@@ -241,7 +236,6 @@ class Matrix {
                     );
                 }
             }
-            //printf("Exiting matmul\n\n");
             return M;
         }
 
@@ -286,7 +280,6 @@ class Matrix {
         }
 
         Matrix sum(int axis){
-            //printf("Entering sum, %i\n", axis);
             if (axis == 0){
                 Matrix M = Matrix(1, this->cols, 0.0);
                 for (int j = 0; j < this->cols; j++){
@@ -296,7 +289,6 @@ class Matrix {
                     } 
                     M.setElement(0, j, element);
                 }
-                //printf("Exiting sum\n");
                 return M;
             } else {
                 Matrix M = Matrix(this->rows, 1, 0.0);
@@ -307,13 +299,11 @@ class Matrix {
                     } 
                     M.setElement(i, 0, element);
                 }
-                //printf("Exiting sum\n");
                 return M;
             }
         }
 
         Matrix hadamard(Matrix other){
-            //printf("Entering Hadamard\n");
             Matrix M = Matrix(this->rows, this->cols, 0.0);
             for (int i = 0; i < this->rows; i++){
                 for (int j = 0; j < this->cols; j++){
@@ -324,7 +314,6 @@ class Matrix {
                     );
                 }
             }
-            //printf("Exiting Hadamard\n\n");
             return M;
         }
 

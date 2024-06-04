@@ -11,11 +11,8 @@ Matrix convert(int number, int width){
             0,
             bit
         );
-
-        //std::printf("Bit[%i] = %f\n", row, bit);
         
     }
-    //M.print();
     return M;
 }
 
@@ -48,12 +45,8 @@ DataBatch generate(int size){
     Matrix* result = (Matrix*) malloc(sizeof(Matrix) * total);
     for (int index = 0; index < total; index++){
         data[index] = convert(index, size);
-        if (index % 9 == 0){result[index] = oneHot(0, 2);}
+        if (index % 7 == 0){result[index] = oneHot(0, 2);}
         else {result[index] = oneHot(1, 2);}
-        
-        //std::printf("Index: %i\n", index);
-        //data[index].print();
-        //std::printf("\n");
     }
 
     DataBatch batch;
@@ -75,16 +68,16 @@ DataBatch generate(int size){
 }
 
 int main(){
-    int layers = 3;
-    int shape[layers] = {8,20,2};
+    int layers = 4;
+    int shape[layers] = {9,25,5,2};
 
     int* s = shape;
 
     Network N = Network(layers, s, 0.05);
 
-    DataBatch B = generate(8);
+    DataBatch B = generate(9);
 
-    for (int iteration = 0; iteration < 1000; iteration++){
+    for (int iteration = 0; iteration < 10000; iteration++){
         std::printf("Iteration number: %i\n", iteration);
         for (int block = 0; block < B.block; block++){
             //std::printf("Block %i\n", block);
@@ -95,7 +88,7 @@ int main(){
     }
 
     std::printf("T1 = \n");
-    Matrix T1 = convert(0x08, 8);
+    Matrix T1 = convert(0x07, 9);
     T1.print();
     std::printf("\n");
     Matrix R = N.forward(T1);
@@ -103,7 +96,7 @@ int main(){
     std::printf("\n");
 
     std::printf("T2 = \n");
-    T1 = convert(0x09, 8);
+    T1 = convert(0x09, 9);
     T1.print();
     std::printf("\n");
     R = N.forward(T1);

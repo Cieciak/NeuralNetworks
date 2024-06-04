@@ -76,36 +76,13 @@ class Network{
 
         void backward(Matrix I, Matrix O){
             ForwardPropagationResult R = this->feed(I);
-
-                //std::printf("A = \n");
-                //R.A[this->layers - 1].print();
-                //std::printf("\n");
-
-                //std::printf("O = \n");
-                //O.print();
-                //std::printf("\n");
-
             Matrix dZ = R.A[this->layers - 1].sub(O);
             for (int index = layers - 1; index > 0; index--){
                 // Get batch size
                 int m = R.A[index].cols;
 
                 Matrix dW = dZ.matmul(R.A[index - 1].T()).scale(1.0/float(m));
-                Matrix dB = dZ.sum(1).scale(1.0/float(m));
-
-                //std::printf("Layer %i\n", index);
-
-                //std::printf("dZ = \n");
-                //dZ.print();
-                //std::printf("\n");
-
-                //std::printf("A[i-1] = \n");
-                //R.A[index - 1].print();
-                //std::printf("\n");
-
-                //std::printf("dW = \n");
-                //dW.print();
-                //std::printf("\n");
+                Matrix dB = dZ.scale(1.0/float(m));
 
                 dZ = this->weights[index - 1].T().matmul(dZ).hadamard(R.U[index - 1].map(&ReLU_prime));
 
