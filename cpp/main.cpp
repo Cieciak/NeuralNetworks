@@ -1,5 +1,9 @@
-#include <cstdlib>
 #include "network.cpp"
+
+int power(int base, int exponent){
+    if (exponent == 0){return 1;}
+    else {return power(base, exponent - 1) * base;}
+}
 
 Matrix convert(int number, int width){
     Matrix M = Matrix(width, 1, 0.0);
@@ -57,8 +61,8 @@ DataBatch generate(int size){
         Matrix d = data[index * batch_size];
         Matrix r = result[index * batch_size];
         for (int offset = 1; offset < batch_size; offset++){
-            d = d.concat(data[index * batch_size + offset]);
-            r = r.concat(result[index * batch_size + offset]);
+            d = concat(d, data[index * batch_size + offset]);
+            r = concat(r, result[index * batch_size + offset]);
         }
         batch.input[index] = d;
         batch.target[index] = r;
@@ -68,6 +72,8 @@ DataBatch generate(int size){
 }
 
 int main(){
+    init();
+
     int layers = 4;
     int shape[layers] = {9,25,5,2};
 
@@ -77,7 +83,7 @@ int main(){
 
     DataBatch B = generate(9);
 
-    for (int iteration = 0; iteration < 10000; iteration++){
+    for (int iteration = 0; iteration < 100; iteration++){
         std::printf("Iteration number: %i\n", iteration);
         for (int block = 0; block < B.block; block++){
             //std::printf("Block %i\n", block);
@@ -89,16 +95,16 @@ int main(){
 
     std::printf("T1 = \n");
     Matrix T1 = convert(0x07, 9);
-    T1.print();
+    T1.printf();
     std::printf("\n");
     Matrix R = N.forward(T1);
-    R.print();
+    R.printf();
     std::printf("\n");
 
     std::printf("T2 = \n");
     T1 = convert(0x09, 9);
-    T1.print();
+    T1.printf();
     std::printf("\n");
     R = N.forward(T1);
-    R.print();
+    R.printf();
 }

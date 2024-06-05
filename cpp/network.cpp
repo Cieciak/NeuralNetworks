@@ -1,10 +1,6 @@
 #include <cstdlib>
-#include "matrix.cpp"
 
-int power(int base, int exponent){
-    if (exponent == 0){return 1;}
-    else {return power(base, exponent - 1) * base;}
-}
+#include "matrix.cpp"
 
 float ReLU(float x){
     if (x > 0){return x;}
@@ -16,7 +12,7 @@ float ReLU_prime(float x){
     else {return 0.0;}
 }
 
-struct ForwardPropagationResult {
+struct ForwardPropagationResult{
     Matrix* A;
     Matrix* U;
 };
@@ -36,36 +32,34 @@ class Network{
             this->shape = shape;
             this->alpha = alpha;
 
-            this->weights = (Matrix*) malloc( sizeof(Matrix) * (layers - 1) );
-            this->biases  = (Matrix*) malloc( sizeof(Matrix) * (layers - 1) );
+            this->weights = (Matrix*) malloc(sizeof(Matrix) * (layers - 1));
+            this->biases  = (Matrix*) malloc(sizeof(Matrix) * (layers - 1));
 
             for (int index = 0; index < layers - 1; index++){
-                this->weights[index] = Matrix(shape[index + 1], shape[index], 0.0);
-                this->biases[index]  = Matrix(shape[index + 1],            1, 0.0);
-
-                this->weights[index].random();
-                this->biases[index].random();
+                this->weights[index] = randomMatrix(shape[index + 1], shape[index]);
+                this->biases[index]  = randomMatrix(shape[index + 1], 1);
             }
         }
 
         ForwardPropagationResult feed(Matrix I){
             ForwardPropagationResult result;
 
-            result.A = (Matrix*) malloc( sizeof(Matrix) * layers );
-            result.U = (Matrix*) malloc( sizeof(Matrix) * layers );
+            result.A = (Matrix*) malloc(sizeof(Matrix) * layers);
+            result.U = (Matrix*) malloc(sizeof(Matrix) * layers);
 
             result.A[0] = I;
             result.U[0] = I;
 
             Matrix A = I;
             for (int index = 0; index < this->layers - 1; index++){
-                Matrix U = (this->weights[index].matmul(A)).add(this->biases[index]);
-                
+                Matrix U = matmul(this->weights[index], A) + this->biases[index];
+
                 A = U.map(&ReLU);
 
                 result.A[index + 1] = A;
                 result.U[index + 1] = U;
             }
+
             return result;
         }
 
@@ -76,20 +70,24 @@ class Network{
 
         void backward(Matrix I, Matrix O){
             ForwardPropagationResult R = this->feed(I);
-            Matrix dZ = R.A[this->layers - 1].sub(O);
+            Matrix dZ = R.A[this->layers - 1] - O;
             for (int index = layers - 1; index > 0; index--){
-                // Get batch size
                 int m = R.A[index].cols;
 
-                Matrix dW = dZ.matmul(R.A[index - 1].T()).scale(1.0/float(m));
-                Matrix dB = dZ.scale(1.0/float(m));
+                Matrix dW = matmul(dZ, R.A[index - 1].transpose()).scale(1.0/float(m));
+                Matrix dB = dZ.sum(1).scale(1.0/float(m));
 
-                dZ = this->weights[index - 1].T().matmul(dZ).hadamard(R.U[index - 1].map(&ReLU_prime));
+                dZ = hadamard(matmul(this->weights[index - 1].transpose(), dZ), R.U[index - 1].map(&ReLU_prime));
 
-                this->weights[index - 1] = this->weights[index - 1].sub(dW.scale(this->alpha));
-                this->biases[index - 1] = this->biases[index - 1].sub(dB.scale(this->alpha));
+                printf("dW (%i, %i)\n", dW.rows, dW.cols);
+                dW.printf();
+                printf("\n");
+                printf("dB (%i, %i)\n", dB.rows, dB.cols);
+                dB.printf();
+                printf("\n");
+
+                this->weights[index - 1] = this->weights[index - 1] - dW.scale(this->alpha);
+                this->biases[index - 1] = this->biases[index - 1] - dB.scale(this->alpha);
             }
         }
 };
-
-
